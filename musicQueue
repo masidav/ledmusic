@@ -1,0 +1,46 @@
+from collections import deque
+from PyQt4 import QtCore, QtGui
+class Queue():
+    def __init__(self):
+        self.PlayQueue = deque(maxlen=35)
+        self.PrevSong = ''
+        self.updateModel()
+    def addSong(self, song):
+        self.PlayQueue.append(song)
+        self.updateModel()
+
+    def delSong(self, song='', index=-1):
+        try:
+            if song:
+                self.PlayQueue.remove(song)
+            elif index > 0:
+                song = self.PlayQueue[index]
+                self.PlayQueue.remove(song)
+            elif index == 0:
+                self.PrevSong = self.PlayQueue.popleft()
+            else:
+                self.PlayQueue.pop()
+            self.updateModel()
+        except IndexError:
+            print('Queue Empty')
+
+    def addPlaylist(self, playlist):
+        for song in playlist:
+            self.PlayQueue.append(song)
+        self.updateModel()
+
+    def getNext(self):
+        try:
+            return self.PlayQueue[1]
+        except IndexError:
+            print('No Song Next')
+            return ''
+
+    def getPrev(self):
+        return self.PrevSong
+
+    def getCurr(self):
+        return self.PlayQueue[0]
+
+    def updateModel(self):
+        self.Model = QtCore.QStringListModel(self.PlayQueue)
